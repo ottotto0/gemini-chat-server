@@ -26,3 +26,19 @@ function chooseImage(text) {
 }
 
 app.listen(3000, () => console.log("Server running on port 3000"));
+
+import express from "express";
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+// ★ここを追加！
+app.get("/", (req, res) => {
+  res.send("🌸 Gemini Chat Image App is running! 🌸");
+});
+
+// 他のAPIルート（例：/chat）などがあるならそのままでOK
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
