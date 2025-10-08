@@ -7,17 +7,26 @@ app.use(cors());
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const PORT = process.env.PORT || 3000;
 
+// --- チャットAPI ---
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const result = await model.generateContent(message);
-  const reply = result.response.text();
 
-  const image = chooseImage(reply);
-  res.json({ reply, image });
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(message);
+    const reply = result.response.text();
+
+    const image = chooseImage(reply);
+    res.json({ reply, image });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Gemini API呼び出し失敗" });
+  }
 });
 
+// --- 画像選択ロジック ---
 function chooseImage(text) {
   if (text.includes("ナース")) return "https://i.imgur.com/nurse.jpg";
   if (text.includes("検温")) return "https://i.imgur.com/thermo.jpg";
@@ -25,17 +34,13 @@ function chooseImage(text) {
   return "https://i.imgur.com/default.jpg";
 }
 
-app.listen(3000, () => console.log("Server running on port 3000"));
-
-const PORT = process.env.PORT || 3000;
-
-// ★ここを追加！
+// --- ルート確認用 ---
 app.get("/", (req, res) => {
   res.send("🌸 Gemini Chat Image App is running! 🌸");
 });
 
-// 他のAPIルート（例：/chat）などがあるならそのままでOK
-
+// --- サーバー起動 ---
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
