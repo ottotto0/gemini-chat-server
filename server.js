@@ -67,6 +67,10 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
 
+const models = await genAI.listModels();
+console.log(models);
+
+
 // ------------------------------------------------------
 // 🚀 サーバー起動
 // ------------------------------------------------------
