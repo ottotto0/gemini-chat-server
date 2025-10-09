@@ -1,11 +1,16 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+// ------------------------------------------------------
+// 基本設定
+// ------------------------------------------------------
 const app = express();
 app.use(
   cors({
-    origin: "*", // ←どこからでもアクセスOK
+    origin: "*", // ←どこからでもアクセスOK（あとで制限も可）
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
@@ -13,10 +18,15 @@ app.use(
 
 app.use(express.json());
 
+// ------------------------------------------------------
+// Gemini API 初期化
+// ------------------------------------------------------
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const PORT = process.env.PORT || 3000;
 
-// --- チャットAPI ---
+// ------------------------------------------------------
+// 📡 チャットAPI
+// ------------------------------------------------------
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
@@ -33,7 +43,9 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// --- 画像選択ロジック ---
+// ------------------------------------------------------
+// 🖼️ 画像選択ロジック
+// ------------------------------------------------------
 function chooseImage(text) {
   if (text.includes("ナース")) return "https://i.imgur.com/nurse.jpg";
   if (text.includes("検温")) return "https://i.imgur.com/thermo.jpg";
@@ -41,13 +53,23 @@ function chooseImage(text) {
   return "https://i.imgur.com/default.jpg";
 }
 
-// --- ルート確認用 ---
-app.get("/", (req, res) => {
-  res.send("🌸 Gemini Chat Image App is running! 🌸");
+// ------------------------------------------------------
+// 🌸 Reactビルドファイルを提供
+// ------------------------------------------------------
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Reactのbuildフォルダを静的ファイルとして提供
+app.use(express.static(path.join(__dirname, "client/build")));
+
+// API以外のすべてのルートでReactのindex.htmlを返す
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
 
-// --- サーバー起動 ---
+// ------------------------------------------------------
+// 🚀 サーバー起動
+// ------------------------------------------------------
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🌸 Server + React App running on port ${PORT} 🌸`);
 });
-
