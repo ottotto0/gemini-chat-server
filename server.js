@@ -23,17 +23,28 @@ app.use(express.json());
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const PORT = process.env.PORT || 3000;
 
+// 🧠 チャット履歴を保持（サーバー再起動でリセットされる）
+let chatHistory = [];
+
 // ------------------------------------------------------
 // 📡 チャットAPI
 // ------------------------------------------------------
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
+  // 履歴にユーザー発話を追加
+  chatHistory.push({ role: "user", content: message });
+
+  // 履歴が長すぎる場合は古いログを削除（最新10ターンだけ保持）
+  if (chatHistory.length > 20) chatHistory.shift();
+
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    // 🌸 ももかのキャラ設定＋ユーザー入力を含めたプロンプト
-    const prompt = `
+    // 🌸 1回だけ設定を先頭に送る（履歴がある場合は再送しない）
+    let systemPrompt = "";
+    if (chatHistory.length <= 2) {
+      systemPrompt = `
 【キャラ設定】
 ももか：
 - 27歳のナース。
@@ -57,8 +68,18 @@ app.post("/chat", async (req, res) => {
 2️⃣ 必ず10文以内で書く。
 3️⃣ 各文を自然な区切りで改行。
 4️⃣ 会話の最後に番号付き選択肢を出す。
+`;
+    }
 
-たいようくん：「${message}」
+    // 履歴を文字列にまとめる
+    const historyText = chatHistory
+      .map((h) => `${h.role === "user" ? "たいようくん" : "ももか"}：「${h.content}」`)
+      .join("\n");
+
+    const prompt = `
+${systemPrompt}
+
+${historyText}
 
 ももか：
 `;
@@ -73,9 +94,11 @@ app.post("/chat", async (req, res) => {
       .replace(/\n{2,}/g, "\n\n")
       .trim();
 
+    // 履歴にAIの返答を追加
+    chatHistory.push({ role: "assistant", content: reply });
+
     const image = chooseImage(reply);
 
-    // 📨 返却
     res.json({ reply, image });
   } catch (error) {
     console.error(error);
@@ -110,3 +133,4 @@ app.get("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`🌸 Server + React App running on port ${PORT} 🌸`);
 });
+
