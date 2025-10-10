@@ -163,6 +163,10 @@ app.post("/chat", async (req, res) => {
 
     const result = await model.generateContent(prompt);
     const reply = result.response.text();
+    reply = reply
+      .replace(/([。！？♡])\s*/g, "$1\n")
+      .replace(/\n{2,}/g, "\n\n") // 改行が多すぎる場合に整える
+      .trim();
     const image = chooseImage(reply);
 
     res.json({ reply, image });
