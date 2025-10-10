@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 
 function App() {
@@ -37,8 +37,23 @@ function App() {
             <div className="chat-box">
                 {messages.map((msg, i) => (
                     <div key={i} className={`bubble ${msg.sender}`}>
-                        {msg.text}
-                        {msg.image && <img src={msg.image} alt="chat" />}
+                        {/* 💬 改行を反映するために pre-wrap を追加 */}
+                        <p style={{ whiteSpace: "pre-wrap", lineHeight: "1.6" }}>
+                            {msg.text}
+                        </p>
+
+                        {/* 🖼️ 画像がある場合は下に表示 */}
+                        {msg.image && (
+                            <img
+                                src={msg.image}
+                                alt="chat"
+                                style={{
+                                    maxWidth: "200px",
+                                    borderRadius: "10px",
+                                    marginTop: "8px",
+                                }}
+                            />
+                        )}
                     </div>
                 ))}
             </div>
@@ -49,6 +64,7 @@ function App() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="メッセージを入力..."
+                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 />
                 <button onClick={sendMessage}>送信</button>
             </div>
@@ -57,4 +73,3 @@ function App() {
 }
 
 export default App;
-
