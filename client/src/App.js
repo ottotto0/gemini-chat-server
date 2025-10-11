@@ -9,6 +9,7 @@ function App() {
     const [sceneImage, setSceneImage] = useState("");
     const [sceneDesc, setSceneDesc] = useState("");
     const [sceneStatus, setSceneStatus] = useState("");
+    const [loadingScene, setLoadingScene] = useState(false);
 
     // 💬 チャット送信
     const sendMessage = async () => {
@@ -44,6 +45,9 @@ function App() {
             return;
         }
 
+        setLoadingScene(true);
+        setSceneStatus("📤 登録中…");
+
         try {
             const res = await fetch("https://gemini-chat-server-1.onrender.com/add-scene", {
                 method: "POST",
@@ -61,10 +65,13 @@ function App() {
                 setSceneStatus("✅ 登録完了: " + data.scene.description);
                 setSceneImage("");
                 setSceneDesc("");
+                setTimeout(() => setSceneStatus(""), 3000); // ⏰ 3秒後に消える
             }
         } catch (err) {
             console.error(err);
             setSceneStatus("💦 登録エラー: サーバー接続に失敗");
+        } finally {
+            setLoadingScene(false);
         }
     };
 
@@ -142,16 +149,18 @@ function App() {
 
                 <button
                     onClick={addScene}
+                    disabled={loadingScene}
                     style={{
-                        backgroundColor: "#ff85a2",
+                        backgroundColor: loadingScene ? "#ffb6c1" : "#ff85a2",
                         color: "white",
                         padding: "6px 12px",
                         border: "none",
                         borderRadius: "8px",
-                        cursor: "pointer",
+                        cursor: loadingScene ? "not-allowed" : "pointer",
+                        transition: "0.3s",
                     }}
                 >
-                    登録する💾
+                    {loadingScene ? "登録中..." : "登録する💾"}
                 </button>
 
                 {sceneStatus && (
