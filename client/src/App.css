@@ -8,9 +8,10 @@ body {
     margin: 0;
 }
 
+/* 🌸 メインコンテナ */
 .chat-container {
-    width: 380px;
-    height: 600px;
+    width: 400px;
+    height: 680px;
     background: white;
     border-radius: 20px;
     box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
@@ -19,68 +20,159 @@ body {
     overflow: hidden;
 }
 
+/* 💗 タイトルバー */
 .title {
-    background: #ffb6c1;
+    background: linear-gradient(135deg, #ff9ac6, #ffb6c1);
     color: white;
     text-align: center;
-    padding: 12px;
+    padding: 14px;
     font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #ffaacb;
 }
 
+/* 💬 チャットエリア */
 .chat-box {
     flex: 1;
-    padding: 10px;
+    padding: 10px 12px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    background: #fffafc;
+    scroll-behavior: smooth;
 }
 
 .bubble {
-    max-width: 70%;
+    max-width: 75%;
     padding: 10px 14px;
     border-radius: 18px;
     font-size: 15px;
     word-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    position: relative;
+    animation: fadeIn 0.3s ease;
 }
 
-    .bubble.user {
-        align-self: flex-end;
-        background: #ffb6c1;
-        color: white;
-    }
+/* 💬 ユーザー側の吹き出し */
+.bubble.user {
+    align-self: flex-end;
+    background: #ff9ac6;
+    color: white;
+    border-bottom-right-radius: 5px;
+}
 
-    .bubble.ai {
-        align-self: flex-start;
-        background: #f3f3f3;
-        color: #333;
-    }
+/* 💬 AI（ももか）側の吹き出し */
+.bubble.ai {
+    align-self: flex-start;
+    background: #f7f0f4;
+    color: #333;
+    border-bottom-left-radius: 5px;
+}
 
-    .bubble img {
-        display: block;
-        margin-top: 8px;
-        border-radius: 10px;
-        max-width: 100%;
-    }
+/* 🖼️ 画像（AI返答の下に表示） */
+.bubble img {
+    display: block;
+    margin-top: 8px;
+    border-radius: 12px;
+    max-width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
 
+/* ✏️ 入力欄 */
 .input-area {
     display: flex;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #f3c1d8;
+    background: #fff0f6;
 }
 
-    .input-area input {
-        flex: 1;
-        padding: 10px;
-        border: none;
-        font-size: 15px;
-        outline: none;
-    }
+.input-area input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    font-size: 15px;
+    outline: none;
+    background: transparent;
+}
 
-    .input-area button {
-        background: #ff69b4;
-        color: white;
-        border: none;
-        padding: 0 20px;
-        cursor: pointer;
-        font-size: 15px;
-    }
+.input-area button {
+    background: #ff69b4;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    font-size: 15px;
+    border-top-left-radius: 10px;
+    transition: 0.2s;
+}
+
+.input-area button:hover {
+    background: #ff85a2;
+}
+
+/* 🎨 シーン登録フォーム */
+.scene-form {
+    background: #fff5f8;
+    border-top: 2px solid #ffd4e3;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.scene-form h3 {
+    margin: 0 0 8px;
+    color: #e75480;
+    font-size: 16px;
+    text-align: center;
+}
+
+.scene-form input,
+.scene-form textarea {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ffb6c1;
+    font-size: 14px;
+    background: #fff;
+    transition: 0.2s;
+}
+
+.scene-form input:focus,
+.scene-form textarea:focus {
+    border-color: #ff85a2;
+    outline: none;
+    box-shadow: 0 0 4px rgba(255, 105, 180, 0.4);
+}
+
+.scene-form button {
+    background: linear-gradient(135deg, #ff85a2, #ff69b4);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.scene-form button:hover {
+    background: linear-gradient(135deg, #ff69b4, #ff85a2);
+    transform: scale(1.03);
+}
+
+/* ✅ ステータスメッセージ */
+.scene-form p {
+    margin-top: 6px;
+    font-size: 13px;
+    text-align: center;
+    color: #666;
+}
+
+/* 🌈 フェードアニメーション */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
