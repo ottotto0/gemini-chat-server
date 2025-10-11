@@ -72,7 +72,7 @@ body {
     border-bottom-left-radius: 5px;
 }
 
-/* 🖼️ 画像（AI返答の下に表示） */
+/* 🖼️ AIの返答画像 */
 .bubble img {
     display: block;
     margin-top: 8px;
@@ -119,6 +119,7 @@ body {
     padding: 12px;
     display: flex;
     flex-direction: column;
+    animation: fadeIn 0.4s ease;
 }
 
 .scene-form h3 {
@@ -128,6 +129,7 @@ body {
     text-align: center;
 }
 
+/* 📸 入力欄 */
 .scene-form input,
 .scene-form textarea {
     width: 100%;
@@ -147,6 +149,7 @@ body {
     box-shadow: 0 0 4px rgba(255, 105, 180, 0.4);
 }
 
+/* 💾 登録ボタン */
 .scene-form button {
     background: linear-gradient(135deg, #ff85a2, #ff69b4);
     color: white;
