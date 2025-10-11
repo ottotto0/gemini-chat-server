@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -23,7 +24,9 @@ app.use(express.json());
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const PORT = process.env.PORT || 3000;
 
-// 🧠 チャット履歴を保持（サーバー再起動でリセットされる）
+// ------------------------------------------------------
+// 🧠 チャット履歴
+// ------------------------------------------------------
 let chatHistory = [];
 
 // ------------------------------------------------------
@@ -31,21 +34,15 @@ let chatHistory = [];
 // ------------------------------------------------------
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
-
-  // 履歴にユーザー発話を追加
   chatHistory.push({ role: "user", content: message });
-
-  // 履歴が長すぎる場合は古いログを削除（最新10ターンだけ保持）
   if (chatHistory.length > 20) chatHistory.shift();
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    // 🌸 1回だけ設定を先頭に送る（履歴がある場合は再送しない）
     let systemPrompt = "";
     if (chatHistory.length <= 2) {
-      systemPrompt = `
-ももかの情報
+      systemPrompt = `ももかの情報
 名前：ももか
 職業：ナース
 年齢：27歳
@@ -166,11 +163,9 @@ app.post("/chat", async (req, res) => {
 ・ナースの手による“処置”として、ぬちゅぬちゅ手コキでお射精ピュッピ♡まで導く一連の流れ。
 ・触診開始→我慢汁観察→ローション手コキ→許可プレイ→おててにビュルルル♡→お掃除＆ご褒美。
 ・セリフ：「これはおちんちんの筋肉チェック♡」「観察続けよっか♡」「ナースが変なことするわけないよ♡」「ピュルルルってして♡」「変態さん♡えらかったね♡」など。
-・再演希望時は「手コキでお射精ピュッピュ♡ルート」とキーワードで再現可能。.
-`;
+・再演希望時は「手コキでお射精ピュッピュ♡ルート」とキーワードで再現可能。.`;
     }
 
-    // 履歴を文字列にまとめる
     const historyText = chatHistory
       .map((h) => `${h.role === "user" ? "たいようくん" : "ももか"}：「${h.content}」`)
       .join("\n");
@@ -183,17 +178,13 @@ ${historyText}
 ももか：
 `;
 
-    // 🔮 AI呼び出し
     const result = await model.generateContent(prompt);
-
-    // 📖 AIの返答を整形して改行を反映
     let reply = result.response.text();
     reply = reply
       .replace(/([。！？♡])\s*/g, "$1\n")
       .replace(/\n{2,}/g, "\n\n")
       .trim();
 
-    // 履歴にAIの返答を追加
     chatHistory.push({ role: "assistant", content: reply });
 
     const image = chooseImage(reply);
@@ -209,6 +200,7 @@ ${historyText}
 // 🖼️ 画像選択ロジック
 // ------------------------------------------------------
 function chooseImage(text) {
+  // ここにシーン登録APIのデータも反映できる（下に実装あり）
   if (text.includes("ナース")) return "https://i.imgur.com/nurse.jpg";
   if (text.includes("検温")) return "https://i.imgur.com/thermo.jpg";
   if (text.includes("清拭")) return "https://i.imgur.com/clean.jpg";
@@ -216,11 +208,48 @@ function chooseImage(text) {
 }
 
 // ------------------------------------------------------
-// 🌸 Reactビルドファイルを提供
+// 🖋️ シーン登録API（たいようくん専用✨）
+// ------------------------------------------------------
+const SCENE_FILE = "./sceneData.json";
+
+// シーンを追加保存するエンドポイント
+app.post("/add-scene", (req, res) => {
+  const { image, description } = req.body;
+
+  if (!image || !description) {
+    return res.status(400).json({ error: "画像URLと説明は必須です。" });
+  }
+
+  try {
+    let scenes = [];
+    if (fs.existsSync(SCENE_FILE)) {
+      scenes = JSON.parse(fs.readFileSync(SCENE_FILE, "utf-8"));
+    }
+
+    const keywords = description.match(/[\u3040-\u30FF\u4E00-\u9FAF]+/g) || [];
+    const newScene = {
+      id: scenes.length + 1,
+      image,
+      description,
+      keywords,
+      createdAt: new Date().toISOString(),
+    };
+
+    scenes.push(newScene);
+    fs.writeFileSync(SCENE_FILE, JSON.stringify(scenes, null, 2), "utf-8");
+
+    res.json({ message: "シーンを登録しました💗", scene: newScene });
+  } catch (err) {
+    console.error("❌ シーン登録エラー:", err);
+    res.status(500).json({ error: "シーン登録に失敗しました💦" });
+  }
+});
+
+// ------------------------------------------------------
+// 🌸 Reactビルドファイル提供
 // ------------------------------------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 app.use(express.static(path.join(__dirname, "client/build")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "client/build", "index.html"));
@@ -232,4 +261,3 @@ app.get("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`🌸 Server + React App running on port ${PORT} 🌸`);
 });
-
