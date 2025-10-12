@@ -4,22 +4,22 @@ body {
     font-family: "Noto Sans JP", sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start; /* 👈 上寄せに変更！ */
+    min-height: 100vh;
     margin: 0;
+    padding: 20px; /* 👈 画面上下に余白をつけて隠れ防止 */
+    overflow-y: auto; /* 👈 ページ全体がスクロールできるように */
 }
 
 /* 💗 メインコンテナ */
 .chat-container {
     width: 400px;
-    min-height: 680px; /* ← 高さ固定から最小高さに変更！ */
     background: white;
     border-radius: 20px;
     box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* ← スクロール可能にしてフォームが隠れないように！ */
-    scroll-behavior: smooth;
+    overflow: visible; /* 👈 auto → visible に変更して高さ制限解除 */
 }
 
 /* 💕 タイトルバー */
@@ -44,6 +44,7 @@ body {
     gap: 10px;
     background: #fffafc;
     scroll-behavior: smooth;
+    max-height: 400px; /* 👈 チャット部分だけに高さ制限をかける */
 }
 
 /* 💬 吹き出し */
@@ -90,7 +91,7 @@ body {
     border-top: 1px solid #f3c1d8;
     background: #fff0f6;
     position: sticky;
-    bottom: 0; /* ← 入力欄を下固定 */
+    bottom: 0;
 }
 
 .input-area input {
@@ -127,6 +128,7 @@ body {
     animation: fadeIn 0.4s ease;
     position: relative;
     z-index: 10;
+    margin-top: 16px;
 }
 
 .scene-form h3 {
