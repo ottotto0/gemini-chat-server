@@ -5,16 +5,13 @@ function App() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
 
-    // 💾 シーン登録用のstate
     const [sceneImage, setSceneImage] = useState("");
     const [sceneDesc, setSceneDesc] = useState("");
     const [sceneStatus, setSceneStatus] = useState("");
     const [loadingScene, setLoadingScene] = useState(false);
 
-    // 💬 チャット送信
     const sendMessage = async () => {
         if (!input.trim()) return;
-
         const userMessage = { sender: "user", text: input };
         setMessages((prev) => [...prev, userMessage]);
         setInput("");
@@ -25,26 +22,19 @@ function App() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: input }),
             });
-
             const data = await res.json();
-            const aiMessage = {
-                sender: "ai",
-                text: data.reply,
-                image: data.image,
-            };
+            const aiMessage = { sender: "ai", text: data.reply, image: data.image };
             setMessages((prev) => [...prev, aiMessage]);
         } catch (err) {
             console.error(err);
         }
     };
 
-    // 🌸 シーン登録送信
     const addScene = async () => {
         if (!sceneImage.trim() || !sceneDesc.trim()) {
             setSceneStatus("⚠️ 画像URLと説明を入力してね");
             return;
         }
-
         setLoadingScene(true);
         setSceneStatus("📤 登録中…");
 
@@ -52,13 +42,10 @@ function App() {
             const res = await fetch("https://gemini-chat-server-1.onrender.com/add-scene", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    image: sceneImage,
-                    description: sceneDesc,
-                }),
+                body: JSON.stringify({ image: sceneImage, description: sceneDesc }),
             });
-
             const data = await res.json();
+
             if (data.error) {
                 setSceneStatus("❌ 登録失敗: " + data.error);
             } else {
@@ -69,7 +56,7 @@ function App() {
             }
         } catch (err) {
             console.error(err);
-            setSceneStatus("💦 登録エラー: サーバー接続に失敗");
+            setSceneStatus("💦 サーバー接続エラー");
         } finally {
             setLoadingScene(false);
         }
@@ -79,14 +66,13 @@ function App() {
         <div className="chat-container">
             <h2 className="title">💗 Gemini Chat 💗</h2>
 
-            {/* 💬 チャットボックス */}
+            {/* 💬 チャット欄 */}
             <div className="chat-box">
                 {messages.map((msg, i) => (
                     <div key={i} className={`bubble ${msg.sender}`}>
                         <p style={{ whiteSpace: "pre-wrap", lineHeight: "1.6" }}>
                             {msg.text}
                         </p>
-
                         {msg.image && (
                             <img
                                 src={msg.image}
@@ -102,7 +88,7 @@ function App() {
                 ))}
             </div>
 
-            {/* 🖼️ シーン登録フォーム */}
+            {/* 🎨 シーン登録フォーム */}
             <div className="scene-form">
                 <h3>🎨 シーン登録フォーム</h3>
 
@@ -127,7 +113,7 @@ function App() {
                 {sceneStatus && <p>{sceneStatus}</p>}
             </div>
 
-            {/* 💌 入力エリア */}
+            {/* ✏️ 入力エリア */}
             <div className="input-area">
                 <input
                     type="text"
