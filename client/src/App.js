@@ -65,7 +65,7 @@ function App() {
                 setSceneStatus("✅ 登録完了: " + data.scene.description);
                 setSceneImage("");
                 setSceneDesc("");
-                setTimeout(() => setSceneStatus(""), 3000); // ⏰ 3秒後に消える
+                setTimeout(() => setSceneStatus(""), 3000);
             }
         } catch (err) {
             console.error(err);
@@ -102,6 +102,31 @@ function App() {
                 ))}
             </div>
 
+            {/* 🖼️ シーン登録フォーム */}
+            <div className="scene-form">
+                <h3>🎨 シーン登録フォーム</h3>
+
+                <input
+                    type="text"
+                    value={sceneImage}
+                    onChange={(e) => setSceneImage(e.target.value)}
+                    placeholder="画像URLを入力"
+                />
+
+                <textarea
+                    value={sceneDesc}
+                    onChange={(e) => setSceneDesc(e.target.value)}
+                    placeholder="シーンの説明（例：ももかさんがたいようくんの服を脱がせている）"
+                    rows="3"
+                ></textarea>
+
+                <button onClick={addScene} disabled={loadingScene}>
+                    {loadingScene ? "登録中..." : "登録する💾"}
+                </button>
+
+                {sceneStatus && <p>{sceneStatus}</p>}
+            </div>
+
             {/* 💌 入力エリア */}
             <div className="input-area">
                 <input
@@ -112,60 +137,6 @@ function App() {
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 />
                 <button onClick={sendMessage}>送信</button>
-            </div>
-
-            {/* 🖼️ シーン登録フォーム */}
-            <div className="scene-form" style={{ marginTop: "20px", padding: "10px", borderTop: "1px solid #ffb6c1" }}>
-                <h3 style={{ color: "#e75480" }}>🎨 シーン登録フォーム</h3>
-
-                <input
-                    type="text"
-                    value={sceneImage}
-                    onChange={(e) => setSceneImage(e.target.value)}
-                    placeholder="画像URLを入力"
-                    style={{
-                        width: "100%",
-                        marginBottom: "8px",
-                        padding: "6px",
-                        borderRadius: "6px",
-                        border: "1px solid #ccc",
-                    }}
-                />
-
-                <textarea
-                    value={sceneDesc}
-                    onChange={(e) => setSceneDesc(e.target.value)}
-                    placeholder="シーンの説明（例：ももかさんがたいようくんの服を脱がせている）"
-                    rows="3"
-                    style={{
-                        width: "100%",
-                        marginBottom: "8px",
-                        padding: "6px",
-                        borderRadius: "6px",
-                        border: "1px solid #ccc",
-                        resize: "none",
-                    }}
-                ></textarea>
-
-                <button
-                    onClick={addScene}
-                    disabled={loadingScene}
-                    style={{
-                        backgroundColor: loadingScene ? "#ffb6c1" : "#ff85a2",
-                        color: "white",
-                        padding: "6px 12px",
-                        border: "none",
-                        borderRadius: "8px",
-                        cursor: loadingScene ? "not-allowed" : "pointer",
-                        transition: "0.3s",
-                    }}
-                >
-                    {loadingScene ? "登録中..." : "登録する💾"}
-                </button>
-
-                {sceneStatus && (
-                    <p style={{ marginTop: "10px", color: "#444" }}>{sceneStatus}</p>
-                )}
             </div>
         </div>
     );
